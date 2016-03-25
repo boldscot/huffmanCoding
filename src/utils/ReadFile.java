@@ -14,10 +14,10 @@ public class ReadFile {
 
 		try (BufferedReader br = new BufferedReader(new FileReader(file)) ) {
 
-			String sCurrentLine;
+			String line;
 
-			while ((sCurrentLine = br.readLine()) != null) {
-				System.out.println(sCurrentLine);
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
 			}
 
 		} catch (IOException e) {

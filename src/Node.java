@@ -5,13 +5,19 @@
 
 public class Node implements Comparable<Node>{
 
-	private int weight;
-	private char data;
-	private Node left = null, right = null;
+	private int weight, nodeNumber;
+	private String data;
+	private Node left, right, root;
+	public static int counter = 0;
 
-	public Node(int weight, char data) {
+	public Node(int weight, String data) {
 		this.weight = weight;
 		this.data = data;
+		this.left = null;
+		this.right = null;
+		this.root = null;
+		this.nodeNumber = counter;
+		++counter;
 	}
 
 	/**
@@ -35,7 +41,7 @@ public class Node implements Comparable<Node>{
 	/**
 	 * @return the data
 	 */
-	public char getData() {
+	public String getData() {
 		return data;
 	}
 
@@ -66,14 +72,24 @@ public class Node implements Comparable<Node>{
 	public void setRight(Node right) {
 		this.right = right;
 	}
+	
+	/**
+	 * @return the root
+	 */
+	public Node getRoot() {
+		return root;
+	}
+
+	/**
+	 * @param root the root to set
+	 */
+	public void setRoot(Node root) {
+		this.root = root;
+	}
 
 	@Override
-	public String toString()
-	{
-		return  "Weight: " + weight + "\n"
-				+ "Data: " + data + "\n"
-				+"Left Node: " + left + "\n"
-				+"Right Node: " + right + "\n";
+	public String toString() {
+		return  "Node " + nodeNumber + ": [ Weight: " + weight + "," + " Data: " + data + " ]" + "\n";
 
 	}
 
