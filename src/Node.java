@@ -89,7 +89,7 @@ public class Node implements Comparable<Node>{
 
 	@Override
 	public String toString() {
-		return  "Node " + nodeNumber + ": [ Weight: " + weight + "," + " Data: " + data + " ]" + "\n";
+		return  "Node number: " + nodeNumber + ": [ Weight: " + weight + "," + " Data: " + data + " ]" + "\n";
 
 	}
 

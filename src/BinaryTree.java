@@ -3,6 +3,7 @@
  *
  */
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class BinaryTree {
@@ -12,18 +13,29 @@ public class BinaryTree {
 	private ArrayList<Character> charArray;
 	private final String TEST_STRING= "Hello World, Good Morning! How is everyone doing?";
 	
-	public BinaryTree() {
-		Main();
+	/*
+	 * 
+	 */
+	public static void main (String[] args) {
+		new BinaryTree();
 	}
-
-	private void Main() {
+	
+	
+	/*
+	 * 
+	 */
+	public BinaryTree() {
 		forrest = new ArrayList<>();
 		charArray = new ArrayList<>();
 		buildTree();
 		
-		encodeText(TEST_STRING);
+		decodeText(encodeText(TEST_STRING));
 	}
 	
+	
+	/*
+	 * 
+	 */
 	private void buildTree() {
 		//Add all characters from the string to the charArray.
 		for (int index = 0; index < TEST_STRING.length(); ++index) {
@@ -34,6 +46,7 @@ public class BinaryTree {
 		//Call to linkNodes method.
 		linkNodes();
 	}
+	
 
 	/*
 	 * This method makes the nodes that will be linked to form a binary tree.
@@ -53,6 +66,7 @@ public class BinaryTree {
 			}
 		}
 	}
+	
 
 	/*
 	 * This method links the nodes to create the tree, the two lowest weighted nodes data and weight are used to make
@@ -68,9 +82,11 @@ public class BinaryTree {
 			--counter;
 			Node secondLowest = forrest.get(counter);
 			//Make a new node that is the root of the 2 lowest weight nodes.
-			Node newNode = new Node( lowest.getWeight() + secondLowest.getWeight() , lowest.getData() + secondLowest.getData() ); 
+			Node newNode = new Node( lowest.getWeight() + secondLowest.getWeight() , 
+					lowest.getData() + secondLowest.getData() ); 
 			newNode.setLeft(lowest);
 			newNode.setRight(secondLowest);
+
 			System.out.println("The two lowest weight nodes: " + "\n" + lowest + secondLowest + "\n" + "The new node: " + newNode);
 
 			//Set the root on both the nodes to the new node.
@@ -82,30 +98,70 @@ public class BinaryTree {
 			forrest.add(0, newNode);
 			Collections.sort(forrest.subList(0, counter));
 		}
-
 		treeRootNode = forrest.get(0);
 		System.out.println("This is the root of the tree: " + treeRootNode);
 
 	}
 	
-	private void encodeText(String text) {
-		String encodedString = "";
-		for (int index = 0; index < text.length(); ++index) {
-			encodedString+=encodeACharacter(text.charAt(index));
-		}
+	
+	/*
+	 * 
+	 */
+	private String decodeText(String str) {
+		Node currentNode = treeRootNode;
+		String decodedText = "";
+		char goLeft = '0', goRight='1';
 		
-		System.out.println("This is the encoded text: " + encodedString);
+		int counter = 0;
+		while(counter < str.length() )  {
+			if (str.charAt(counter) == goLeft) {
+				if (currentNode.getLeft() != null ) {
+					currentNode = currentNode.getLeft();
+					++counter;
+				} else {
+					//Node was null, must be the the first bit of the next char.
+					decodedText += currentNode.getData();
+					currentNode = treeRootNode;
+				}
+			} else if (str.charAt(counter) == goRight){
+				if (currentNode.getRight() !=null ) {
+					currentNode = currentNode.getRight();
+					++counter;
+				} else {
+					//Node was null, must be the the first bit of the next char.
+					decodedText+=currentNode.getData();
+					currentNode = treeRootNode;
+				}
+			}
+		}
+		//Last character.
+		decodedText += currentNode.getData();
+		System.out.println("The decoded message: " + decodedText);
+		return decodedText;
 	}
 	
-	private void decodeString(String str) {
-		
+	
+	/*
+	 * 
+	 */
+	private String encodeText(String text) {
+		String encodedString = "";
+		for (int index = 0; index < text.length(); ++index) {
+			encodedString += encodeACharacter(text.charAt(index));
+		}
+		System.out.println("This is the encoded text: " + encodedString);
+		return encodedString;
 	}
-
+	
+	
+	/*
+	 * 
+	 */
 	private String encodeACharacter(char ch) {
 		Node currentNode = null;
 		String encodedChar= "";
 		char currentCh = ch ;
-		
+
 		if (treeRootNode.getLeft().getData().contains(String.valueOf(currentCh) ) ) {
 			currentNode = treeRootNode.getLeft();
 			encodedChar += "0";
@@ -114,16 +170,17 @@ public class BinaryTree {
 			currentNode = treeRootNode.getRight();
 			encodedChar += "1";
 		}
-		
 		while (currentNode.getLeft() != null && currentNode.getRight() != null ) {
 			if (currentNode.getData().contains(String.valueOf(currentCh)) ) {
 				if (currentNode.getData().equals(String.valueOf(currentCh)) ){
 					return encodedChar;
 				}
-				else if (currentNode.getLeft() != null && currentNode.getLeft().getData().contains(String.valueOf(currentCh) ) ) {
+				else if (currentNode.getLeft() != null 
+						&& currentNode.getLeft().getData().contains(String.valueOf(currentCh) ) ) {
 					currentNode = currentNode.getLeft();
 					encodedChar += "0";
-				} else if (currentNode.getRight() != null && currentNode.getRight().getData().contains(String.valueOf(currentCh) ) ) {
+				} else if (currentNode.getRight() != null 
+						&& currentNode.getRight().getData().contains(String.valueOf(currentCh) ) ) {
 					currentNode = currentNode.getRight();
 					encodedChar += "1";
 				}
@@ -131,9 +188,4 @@ public class BinaryTree {
 		}
 		return encodedChar;
 	}
-
-	public static void main (String[] args) {
-		new BinaryTree();
-	}
-
 }
