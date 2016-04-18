@@ -6,22 +6,19 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class ReadFile {
+
+	public ReadFile() {}
 	
-	private File file;
-
-	public ReadFile(File file) {
-		this.file = file;
-
-		try (BufferedReader br = new BufferedReader(new FileReader(file)) ) {
-
+	public static String readFromFile(File file) {
+		String str = "";
+		try (BufferedReader br = new BufferedReader(new FileReader(file) ) ) {
 			String line;
-
 			while ((line = br.readLine()) != null) {
-				System.out.println(line);
+				str+=line+"\n";
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
+		return str;
 	}
 }

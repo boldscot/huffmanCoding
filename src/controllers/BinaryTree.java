@@ -1,70 +1,59 @@
+package controllers;
 /**
  * @author Stephen 20061696
  *
  */
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import models.Node;
 
 public class BinaryTree {
 
 	private Node treeRootNode;
-	private ArrayList<Node> forrest;
-	private ArrayList<Character> charArray;
-	private final String TEST_STRING= "Hello World, Good Morning! How is everyone doing?";
+	public ArrayList<Node> forrest;
+	public Map<Character, Integer> charMap;
+	public final String TEST_STRING = "Hello World, Good Morning! How is everyone doing?";
+	public String fileString;
 
 	/*
-	 * 
-	 */
-	public static void main (String[] args) {
-		new BinaryTree();
-	}
-
-
-	/*
-	 * 
+	 *  Constructor.
 	 */
 	public BinaryTree() {
 		forrest = new ArrayList<>();
-		charArray = new ArrayList<>();
-		//Call to build tree method.
-		buildTree();
-		//Pass the test string to the incodeText method then pass the string of 1's and 0's to the decodeText method.
-		decodeText(encodeText(TEST_STRING));
+		charMap = new HashMap<>();
 	}
 
-
 	/*
-	 * 
+	 * Build the tree.
 	 */
-	private void buildTree() {
-		//Add all characters from the string to the charArray.
-		for (int index = 0; index < TEST_STRING.length(); ++index) {
-			charArray.add(TEST_STRING.charAt(index) );
-		}
+	public void buildTree() {
 		//Call to build nodes method.
 		buildNodes();
 		//Call to linkNodes method.
 		linkNodes();
 	}
 
-
 	/*
 	 * This method makes the nodes that will be linked to form a binary tree.
 	 */
 	private void buildNodes () {
-		//Sort the charArray to make finding the number of times a char appears easier.
-		Collections.sort(charArray);
-		char ch = charArray.get(0);
-		int counter = 1;
-		for (int index = 1; index <= charArray.size(); ++index) {
-			if (index != charArray.size() && charArray.get(index) == ch) {
-				++counter;
-			} else {
-				forrest.add(new Node(counter, String.valueOf(ch)) );
-				if (index != charArray.size()) ch = charArray.get(index);
-				counter = 1;
-				siftUp();
-			}
+		//Add all characters from the fileString to the charMap.
+		for (int index = 0; index < fileString.length(); ++index) {
+			char key = fileString.charAt(index);
+			if (!charMap.containsKey(key))charMap.put(key, 1);
+			else
+				charMap.put(key, charMap.get(key)+1);
+		}
+		for (Map.Entry<Character, Integer> entry : charMap.entrySet()) {
+			forrest.add(new Node(entry.getValue(), String.valueOf(entry.getKey())) );
+			if (forrest.size() > 1) siftUp();
+		}
+		for (int i = 0; i< forrest.size(); i++) {
+			System.out.println(forrest.get(i));
 		}
 	}
 
@@ -75,49 +64,61 @@ public class BinaryTree {
 	 * The final new node is set as the root node of the tree.
 	 */
 	private void linkNodes() {
-		int counter = forrest.size()-1;
-		while (counter != 0) {
+		int counter = 0;
+		while (counter != forrest.size() -1) {
 			Node lowest = forrest.get(counter);
-			--counter;
+			counter++;
 			Node secondLowest = forrest.get(counter);
+			counter++;
 			//Make a new node that is the root of the 2 lowest weight nodes.
 			Node newNode = new Node( lowest.getWeight() + secondLowest.getWeight() , 
 					lowest.getData() + secondLowest.getData() ); 
 			newNode.setLeft(lowest);
 			newNode.setRight(secondLowest);
-
 			System.out.println("The two lowest weight nodes: " + "\n" + lowest + secondLowest + "\n" + "The new node: " + newNode);
-
 			//Set the root on both the nodes to the new node.
 			lowest.setRoot(newNode);
 			secondLowest.setRoot(newNode);
-
-			//Add the new node to the forrest ArrayList at index 0 and sort a sublist of the list.
-			//The sublist decreases by one each iteration.
-			forrest.add(0, newNode);
-			Collections.sort(forrest.subList(0, counter));
+			forrest.add(newNode);
+			siftUp();
 		}
-		treeRootNode = forrest.get(0);
+		treeRootNode = forrest.get(forrest.size()-1);
 		System.out.println("This is the root of the tree: " + treeRootNode);
-
 	}
-	
+
+	/*
+	 * This method cycles throught the array working from the bottom up, the weight of the two nodes
+	 * are compared and if the nodes weight  that the compareTo method was called on is less than
+	 * the node being compared the node is moved up the array. 
+	 * Caling this method on each new array entry sorts the array in descending order.
+	 */
 	private void siftUp() {
 		int dataToSift = forrest.size() - 1;
 		while (dataToSift > 0) {
-			int parentOfDataToSift = (dataToSift - 1) / 2;
+			int nextItem = dataToSift - 1;
 			Node item = forrest.get(dataToSift);
-			Node parent = forrest.get(parentOfDataToSift);
-			if (item.compareTo(parent) > 0) {
+			Node nextNode = forrest.get(nextItem);
+			if (item.compareTo(nextNode) < 0) {
 				// swap
-				forrest.set(dataToSift, parent);
-				forrest.set(parentOfDataToSift, item);
-				// move up one level
-				dataToSift = parentOfDataToSift;
-			} else {
+				forrest.set(nextItem, item);
+				forrest.set(dataToSift, nextNode);
+				// move up one node
+				dataToSift--;
+			} else
 				break;
-			}
 		}
+	}
+
+	/*
+	 * 
+	 */
+	public String encodeText(String text) {
+		String encodedStr = "";
+		for (int index = 0; index < text.length(); ++index) {
+			encodedStr += encodeACharacter(text.charAt(index));
+		}
+		System.out.println(encodedStr);
+		return encodedStr;
 	}
 
 	/*
@@ -159,12 +160,14 @@ public class BinaryTree {
 
 
 	/*
-	 * This method 
+	 * This method takes is a string of 1's and 0's and traverses the tree to decode it back into letters.
+	 * If it's a 0 we left in the tree or if its a 1 we go right, if there is no node that corresponds with 
+	 * the 1 or 0 then we go back to the root of the tree because this must mean the start of a new char.
 	 */
-	private String decodeText(String str) {
+	public String decodeText(String str) {
 		Node currentNode = treeRootNode;
 		String decodedText = "";
-		char goLeft = '0', goRight='1';
+		char goLeft = '0';
 
 		int counter = 0;
 		while(counter < str.length() )  {
@@ -177,33 +180,19 @@ public class BinaryTree {
 					decodedText += currentNode.getData();
 					currentNode = treeRootNode;
 				}
-			} else if (str.charAt(counter) == goRight){
-				if (currentNode.getRight() !=null ) {
+			} else {
+				if (currentNode.getRight() != null ) {
 					currentNode = currentNode.getRight();
 					++counter;
 				} else {
 					//Node was null, must be the the first bit of the next char.
 					decodedText+=currentNode.getData();
 					currentNode = treeRootNode;
-				}
+				} 
 			}
 		}
 		//Last character.
 		decodedText += currentNode.getData();
-		System.out.println("The decoded message: " + decodedText);
 		return decodedText;
-	}
-
-
-	/*
-	 * 
-	 */
-	private String encodeText(String text) {
-		String encodedString = "";
-		for (int index = 0; index < text.length(); ++index) {
-			encodedString += encodeACharacter(text.charAt(index));
-		}
-		System.out.println("This is the encoded text: " + encodedString);
-		return encodedString;
 	}
 }

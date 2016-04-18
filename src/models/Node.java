@@ -1,3 +1,4 @@
+package models;
 /**
  *	@author Stephen Collins 20061696
  * 
@@ -28,7 +29,7 @@ public class Node implements Comparable<Node>{
 	@Override
 	public int compareTo(Node compareNode){
 		int compareNodeWeight = compareNode.getWeight();
-		return compareNodeWeight-this.getWeight();
+		return this.getWeight()- compareNodeWeight;
 	}
 
 	/**
